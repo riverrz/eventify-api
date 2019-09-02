@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
+const generateRandomToken = require("../helpers/generateRandomToken");
 
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: true,
-      index: true,
       unique: true
     },
     userId: {
       type: String,
       required: true,
       index: true,
-      unique: true
+      unique: true,
+      default: () => "U-" + generateRandomToken()
     },
     email: {
       type: String,
