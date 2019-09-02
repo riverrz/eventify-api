@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt-nodejs");
+const { genToken } = require("../helpers/jwtToken");
 
 exports.getCurrent = (req, res, next) => {
   if (!req.user) {
@@ -50,6 +51,35 @@ exports.postRegister = async (req, res, next) => {
           next(error);
         }
       });
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postLogin = async (req, res, next) => {
+  // Validate req.body
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("Invalid email/password");
+      error.statusCode = 401;
+      return next(error);
+    }
+    bcrypt.compare(password, user.password, async (err, isMatch) => {
+      if (err) {
+        const error = new Error("An error occurred");
+        return next(error);
+      }
+      if (!isMatch) {
+        const error = new Error("Invalid email/password");
+        error.statusCode = 401;
+        return next(error);
+      }
+      const token = await genToken({ userId: user.userId });
+      res.json({ success: true, token });
     });
   } catch (error) {
     next(error);

@@ -10,4 +10,6 @@ router.get("/current", isAuth, authController.getCurrent);
 
 router.post("/register", authController.postRegister);
 
+router.post("/login", authController.postLogin);
+
 module.exports = router;
