@@ -1,6 +1,9 @@
 const express = require("express");
+const mongoose = require("mongoose");
 
 const app = express();
+
+const keys = require("./keys/keys");
 
 const PORT = process.env.PORT || 5000;
 
@@ -16,6 +19,12 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log("Server has started");
+mongoose.connect(keys.DB_URI, { useNewUrlParser: true }, err => {
+  if (err) {
+    throw err;
+  }
+  console.log("DB connected");
+  app.listen(PORT, () => {
+    console.log("Server has started");
+  });
 });

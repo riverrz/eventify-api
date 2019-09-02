@@ -4,6 +4,8 @@ const router = express.Router();
 
 const authController = require("../controllers/authController");
 
-router.get("/check", authController.getCheck);
+const { isAuth } = require("../middlewares/auth");
+
+router.get("/current", isAuth, authController.getCurrent);
 
 module.exports = router;

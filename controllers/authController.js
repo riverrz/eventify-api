@@ -1,3 +1,6 @@
-exports.getCheck = (req, res, next) => {
-  res.send("Working");
+exports.getCurrent = (req, res, next) => {
+  res.json({
+    success: true,
+    user: req.user
+  });
 };
