@@ -5,7 +5,8 @@ exports.isAuth = async (req, res, next) => {
   try {
     const payload = verifyToken(req.headers.authorization);
     if (payload.error) {
-      return next(payload.errorMessage);
+      const error = new Error(payload.message);
+      return next(error);
     }
     const user = await User.findOne({ userId: payload.userId });
     if (!user) {

@@ -8,12 +8,14 @@ const keys = require("./keys/keys");
 
 const PORT = process.env.PORT || 5000;
 
-const authController = require("./routes/auth");
+const authRoutes = require("./routes/auth");
+const eventRoutes = require("./routes/event");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/auth", authController);
+app.use("/auth", authRoutes);
+app.use("/event", eventRoutes);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
@@ -23,7 +25,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-mongoose.connect(keys.DB_URI, { useNewUrlParser: true }, err => {
+mongoose.connect(keys.DB_URI, { useNewUrlParser: true, useCreateIndex: true }, err => {
   if (err) {
     throw err;
   }
