@@ -8,7 +8,9 @@ exports.isAuth = async (req, res, next) => {
       const error = new Error(payload.message);
       return next(error);
     }
-    const user = await User.findOne({ userId: payload.userId });
+    const user = await User.findOne({ userId: payload.userId }).select(
+      "username email userId -_id"
+    );
     if (!user) {
       const error = new Error("Invalid token");
       error.statusCode = 402;

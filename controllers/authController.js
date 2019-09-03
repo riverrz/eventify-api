@@ -7,9 +7,6 @@ exports.getCurrent = (req, res, next) => {
     const error = new Error("An error occurred");
     return next(error);
   }
-  // remove password field before sending the response
-  req.user = JSON.parse(JSON.stringify(req.user));
-  delete req.user.password;
   res.json(req.user);
 };
 
