@@ -1,5 +1,26 @@
 const Event = require("../models/Event");
 
+exports.getEvent = async (req, res, next) => {
+  try {
+    const eventId = req.params.eventId;
+    const foundEvent = await Event.findOne({ eventId })
+      .select("creatorId creator startTimeStamp endTimeStamp eventId -_id")
+      .populate("creator", "username email userId -_id")
+      .exec();
+    if (!foundEvent) {
+      const error = new Error("No such event exists!");
+      error.statusCode = 404;
+      return next(error);
+    }
+    res.json({
+      success: true,
+      event: foundEvent
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.postEvent = async (req, res, next) => {
   try {
     const eventObject = {
@@ -11,7 +32,8 @@ exports.postEvent = async (req, res, next) => {
     const newEvent = new Event(eventObject);
     await newEvent.save();
     res.status(201).json({
-      success: true
+      success: true,
+      eventId: newEvent.eventId
     });
   } catch (error) {
     next(error);

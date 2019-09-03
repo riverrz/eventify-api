@@ -25,6 +25,7 @@ const eventSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    id: false,
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
   }
