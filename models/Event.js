@@ -21,7 +21,12 @@ const eventSchema = new mongoose.Schema(
     endTimeStamp: {
       type: Date,
       required: true
-    }
+    },
+    totalParticipantsAllowed: {
+      type: Number,
+      default: 1
+    },
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
   },
   {
     timestamps: true,

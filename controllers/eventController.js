@@ -1,5 +1,7 @@
 const Event = require("../models/Event");
 
+const emailHandler = require("../workers/emailHandler");
+
 exports.getEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
@@ -26,11 +28,16 @@ exports.postEvent = async (req, res, next) => {
     const eventObject = {
       creatorId: req.user.userId,
       startTimeStamp: new Date(req.body.startTimeStamp),
-      endTimeStamp: new Date(req.body.endTimeStamp)
+      endTimeStamp: new Date(req.body.endTimeStamp),
+      totalParticipantsAllowed: req.body.noOfParticipants
     };
-
+    // Create and save event
     const newEvent = new Event(eventObject);
     await newEvent.save();
+
+    // send emails to participants
+    emailHandler(req.body.emailArr);
+
     res.status(201).json({
       success: true,
       eventId: newEvent.eventId
@@ -39,3 +46,5 @@ exports.postEvent = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.postParticipate = (req, res, next) => {};
