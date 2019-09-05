@@ -3,13 +3,14 @@ const keys = require("../keys/keys");
 
 sgMail.setApiKey(keys.SENDGRID_API_KEY);
 
-module.exports = emailAddress => {
+module.exports = (emailAddress, subject, text, html) => {
   // send email via sendgrid
   const msg = {
     to: emailAddress,
     from: "admin@eventify.com",
-    subject: "Participation Link",
-    text: "Use this link to participate in the event: "
+    subject,
+    text,
+    html
   };
   sgMail.send(msg);
 };
