@@ -47,4 +47,30 @@ exports.postEvent = async (req, res, next) => {
   }
 };
 
-exports.postParticipate = (req, res, next) => {};
+exports.postParticipate = async (req, res, next) => {
+  try {
+    const foundEvent = await Event.findOne({ eventId: req.body.eventId });
+    if (!foundEvent) {
+      const error = new Error("Invalid participation token");
+      error.statusCode = 403;
+      return next(error);
+    }
+    // check if user has already confirmed his seat for the event
+    if (foundEvent.participants.includes(req.user._id.toString())) {
+      const error = new Error("You have already confirmed your seat");
+      error.statusCode = 403;
+      return next(error);
+    }
+
+    // check if participationId is valid
+    const participationId = req.body.participationId;
+
+    foundEvent.participants.push(req.user._id);
+    await foundEvent.save();
+    res.json({
+      success: true
+    });
+  } catch (error) {
+    next(error);
+  }
+};
