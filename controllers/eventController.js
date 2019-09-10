@@ -36,7 +36,7 @@ exports.postEvent = async (req, res, next) => {
     await newEvent.save();
 
     // send emails to participants
-    emailHandler(req.body.emailArr);
+    emailHandler(req.body.emailArr, newEvent.eventId);
 
     res.status(201).json({
       success: true,
