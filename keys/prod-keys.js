@@ -1,6 +1,5 @@
 module.exports = {
   DB_URI: process.env.DB_URI,
   SECRET: process.env.SECRET,
-  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
-  PARTICIPATION_LINK_DOMAIN: process.env.PARTICIPATION_LINK_DOMAIN
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY
 };
