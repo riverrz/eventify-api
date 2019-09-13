@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const { redisInit } = require("./config/redisConfig");
 
 const app = express();
+redisInit();
 
 const keys = require("./keys/keys");
 
@@ -25,12 +27,16 @@ app.use((error, req, res, next) => {
   });
 });
 
-mongoose.connect(keys.DB_URI, { useNewUrlParser: true, useCreateIndex: true }, err => {
-  if (err) {
-    throw err;
+mongoose.connect(
+  keys.DB_URI,
+  { useNewUrlParser: true, useCreateIndex: true },
+  err => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB connected");
+    app.listen(PORT, () => {
+      console.log("Server has started");
+    });
   }
-  console.log("DB connected");
-  app.listen(PORT, () => {
-    console.log("Server has started");
-  });
-});
+);
