@@ -40,20 +40,22 @@ exports.validateParticipationToken = async (req, res, next) => {
   // check if the token is present in redis first
   try {
     try {
-      const foundInRedis = await redisClient.getAsync(token);
-      if (foundInRedis) {
+      const recipient = await redisClient.getAsync(token);
+      if (recipient && recipient === req.user.email) {
         return next();
       }
     } catch (error) {
       console.log(error);
     }
-    const foundInMongo = await ParticipationToken.findOne({ token });
-    if (foundInMongo) {
+    const { recipient } = await ParticipationToken.findOne({ token });
+    if (recipient && recipient === req.user.email) {
       return next();
     }
 
     // if token not found in redis and mongo then raise an error
-    const error = new Error("Invalid participation token");
+    const error = new Error(
+      "Invalid participation token / You are not authorized to use this token"
+    );
     error.statusCode = 403;
     return next(error);
   } catch (error) {

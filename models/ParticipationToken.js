@@ -7,6 +7,10 @@ const participationTokenSchema = new Schema(
       type: String,
       required: true
     },
+    recipient: {
+      type: "String",
+      required: true
+    },
     expiration: {
       type: Date,
       required: true

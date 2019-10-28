@@ -11,18 +11,23 @@ function generateTokenPromises(count, size) {
   }
   return tokenPromiseArr;
 }
-async function generateParticipationIds(eventId, count, size, expiration) {
+async function generateParticipationIds(eventId, emailArr, size, expiration) {
   try {
+    const count = emailArr.length;
     const tokenArr = await Promise.all(generateTokenPromises(count, size));
-    const participationTokens = tokenArr.map(token => {
-      return new ParticipationToken({
-        token: `PI-${eventId}-${token}`,
-        expiration
-      });
-    });
+    const participationTokens = [];
+    for (let i = 0; i < count; i++) {
+      participationTokens.push(
+        new ParticipationToken({
+          token: `PI-${eventId}-${tokenArr[i]}`,
+          recipient: emailArr[i],
+          expiration
+        })
+      );
+    }
     // save the tokens in redis and mongodb
-    participationTokens.forEach(({ token }) => {
-      redisClient.set(token, token, "EX", expiration);
+    participationTokens.forEach(({ token, recipient }) => {
+      redisClient.set(token, recipient, "EX", expiration);
     });
     return await ParticipationToken.insertMany(participationTokens);
   } catch (error) {
@@ -33,7 +38,7 @@ async function generateParticipationIds(eventId, count, size, expiration) {
 module.exports = async (emailArr, eventId, tokenExpiration) => {
   const savedParticipationTokens = await generateParticipationIds(
     eventId,
-    emailArr.length,
+    emailArr,
     2,
     tokenExpiration
   );
