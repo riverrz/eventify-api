@@ -67,9 +67,6 @@ exports.postParticipate = async (req, res, next) => {
       return next(error);
     }
 
-    // check if participationId is valid
-    const participationId = req.body.participationId;
-
     foundEvent.participants.push(req.user._id);
     await foundEvent.save();
     res.json({
