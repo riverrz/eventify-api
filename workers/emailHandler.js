@@ -1,23 +1,28 @@
 const sendEmail = require("../helpers/sendEmail");
 const generateRandomToken = require("../helpers/generateRandomToken");
 const ParticipationToken = require("../models/ParticipationToken");
+const { getClient } = require("../config/redisConfig");
+const redisClient = getClient();
 
-function generateRandomTokens(count, size) {
+function generateTokenPromises(count, size) {
   const tokenPromiseArr = [];
   for (let i = 0; i < count; i++) {
     tokenPromiseArr.push(generateRandomToken(size));
   }
   return tokenPromiseArr;
 }
-
 async function generateParticipationIds(eventId, count, size, expiration) {
   try {
-    const tokenArr = await Promise.all(generateRandomTokens(count, size));
+    const tokenArr = await Promise.all(generateTokenPromises(count, size));
     const participationTokens = tokenArr.map(token => {
       return new ParticipationToken({
         token: `PI-${eventId}-${token}`,
         expiration
       });
+    });
+    // save the tokens in redis and mongodb
+    participationTokens.forEach(({ token }) => {
+      redisClient.set(token, token, "EX", expiration);
     });
     return await ParticipationToken.insertMany(participationTokens);
   } catch (error) {
