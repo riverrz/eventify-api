@@ -10,10 +10,8 @@ const userSchema = new mongoose.Schema(
     },
     userId: {
       type: String,
-      required: true,
       index: true,
-      unique: true,
-      default: () => "U-" + generateRandomToken()
+      unique: true
     },
     email: {
       type: String,
@@ -30,5 +28,16 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+userSchema.pre("save", async function() {
+  if (!this.userId) {
+    try {
+      const token = await generateRandomToken();
+      this.userId = "U-" + token;
+    } catch (error) {
+      throw error;
+    }
+  }
+});
 
 module.exports = new mongoose.model("User", userSchema);

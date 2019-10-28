@@ -3,8 +3,10 @@
 const randToken = require("rand-token");
 
 module.exports = function generateToken(size) {
-  size = size || 8;
-  return randToken.generate(size);
+  return new Promise((resolve, reject) => {
+    size = size || 8;
+    resolve(randToken.generate(size));
+  });
 };
 
 // module.exports = async function(size) {
