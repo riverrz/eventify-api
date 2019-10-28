@@ -5,10 +5,8 @@ const eventSchema = new mongoose.Schema(
   {
     eventId: {
       type: String,
-      required: true,
       unique: true,
-      index: true,
-      default: () => "E-" + generateRandomToken(8)
+      index: true
     },
     creatorId: {
       type: String,
@@ -35,6 +33,17 @@ const eventSchema = new mongoose.Schema(
     toJSON: { virtuals: true }
   }
 );
+
+eventSchema.pre("save", async function() {
+  if (!this.eventId) {
+    try {
+      const token = await generateRandomToken(8);
+      this.eventId = "E-" + token;
+    } catch (error) {
+      throw error;
+    }
+  }
+});
 
 eventSchema.virtual("creator", {
   ref: "User",
