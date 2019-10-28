@@ -29,14 +29,14 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(
   keys.DB_URI,
-  { useNewUrlParser: true, useCreateIndex: true },
+  { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
   err => {
     if (err) {
       throw err;
     }
     console.log("DB connected");
     app.listen(PORT, () => {
-      console.log("Server has started");
+      console.log(`Server has started on Port ${PORT}`);
     });
   }
 );
