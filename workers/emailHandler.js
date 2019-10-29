@@ -1,5 +1,6 @@
 const sendEmail = require("../helpers/sendEmail");
 const generateRandomToken = require("../helpers/generateRandomToken");
+const generateHTMLContent = require("../helpers/generateHTMLContent");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 const redisClient = getClient();
@@ -35,19 +36,17 @@ async function generateParticipationIds(eventId, emailArr, size, expiration) {
   }
 }
 
-module.exports = async (emailArr, eventId, tokenExpiration) => {
+module.exports = async (event, sender, emailArr, tokenExpiration) => {
   const savedParticipationTokens = await generateParticipationIds(
-    eventId,
+    event.eventId,
     emailArr,
     2,
     tokenExpiration
   );
-  const subject = "Participation link to join the event";
+  const { subject, genHtml } = generateHTMLContent(event, sender);
   const htmlArr = [];
   for (let i = 0; i < emailArr.length; i++) {
-    htmlArr.push(`<p><strong>This is your unique id for the event: ${savedParticipationTokens[i].token}</strong></p>
-    <p><strong>PLEASE MAKE SURE YOU DO NOT SHARE THIS WITH ANYONE!</strong></p>
-  `);
+    htmlArr.push(genHtml(savedParticipationTokens[i].token));
   }
   sendEmail(emailArr, subject, htmlArr);
   // emailArr.forEach(emailAddress => {

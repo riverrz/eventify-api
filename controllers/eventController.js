@@ -40,8 +40,9 @@ exports.postEvent = async (req, res, next) => {
 
     // send emails to participants
     emailHandler(
+      newEvent,
+      req.user.username,
       req.body.emailArr,
-      newEvent.eventId,
       calcExpirationInSeconds(newEvent.startTimeStamp, newEvent.endTimeStamp)
     );
 
