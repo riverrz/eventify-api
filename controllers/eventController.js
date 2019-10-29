@@ -30,7 +30,9 @@ exports.postEvent = async (req, res, next) => {
       creatorId: req.user.userId,
       startTimeStamp: new Date(req.body.startTimeStamp),
       endTimeStamp: new Date(req.body.endTimeStamp),
-      totalParticipantsAllowed: req.body.totalParticipantsAllowed
+      totalParticipantsAllowed: req.body.totalParticipantsAllowed,
+      title: req.body.title,
+      description: req.body.description
     };
     // Create and save event
     const newEvent = new Event(eventObject);

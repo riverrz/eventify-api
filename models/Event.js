@@ -12,6 +12,17 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    title: {
+      type: String,
+      required: true
+    },
+    banner: {
+      type: String
+    },
+    description: {
+      type: String,
+      required: true
+    },
     startTimeStamp: {
       type: Date,
       required: true
