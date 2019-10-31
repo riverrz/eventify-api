@@ -2,6 +2,22 @@ const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 const redisClient = getClient();
 
+exports.validTimeStamps = (req, res, next) => {
+  const { startTimeStamp, endTimeStamp } = req.body;
+  if (!startTimeStamp || !endTimeStamp) {
+    const error = new Error("Start timestamp / End timestamp is missing");
+    error.statusCode = 400;
+    return next(error);
+  } else if (new Date(startTimeStamp) > new Date(endTimeStamp)) {
+    const error = new Error(
+      "Start timestamp cannot be greater than End timestamp"
+    );
+    error.statusCode = 400;
+    return next(error);
+  }
+  next();
+};
+
 exports.correctParticipantCount = (req, res, next) => {
   if (req.body.totalParticipantsAllowed != req.body.emailArr.length) {
     const error = new Error(
