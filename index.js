@@ -29,7 +29,7 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(
   keys.DB_URI,
-  { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: true },
   err => {
     if (err) {
       throw err;

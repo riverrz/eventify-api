@@ -1,5 +1,5 @@
 const Event = require("../models/Event");
-
+const User = require("../models/User");
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
@@ -38,6 +38,11 @@ exports.postEvent = async (req, res, next) => {
     const newEvent = new Event(eventObject);
     await newEvent.save();
 
+    await User.findOneAndUpdate(
+      { userId: req.user.userId },
+      { $push: { events: newEvent._id } }
+    );
+
     // send emails to participants
     manageParticipationTokens(
       newEvent,
@@ -72,6 +77,7 @@ exports.postParticipate = async (req, res, next) => {
 
     foundEvent.participants.push(req.user._id);
     await foundEvent.save();
+    
     res.json({
       success: true
     });
