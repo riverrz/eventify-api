@@ -1,6 +1,6 @@
 const Event = require("../models/Event");
 
-const emailHandler = require("../workers/emailHandler");
+const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
 exports.getEvent = async (req, res, next) => {
@@ -39,7 +39,7 @@ exports.postEvent = async (req, res, next) => {
     await newEvent.save();
 
     // send emails to participants
-    emailHandler(
+    manageParticipationTokens(
       newEvent,
       req.user.username,
       req.body.emailArr,
