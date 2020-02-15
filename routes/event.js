@@ -8,12 +8,13 @@ const { isAuth } = require("../middlewares/auth");
 const {
   correctParticipantCount,
   splitParticipationToken,
-  validateParticipationToken
+  validateParticipationToken,
+  validTimeStamps
 } = require("../middlewares/events");
 
 router.get("/:eventId", eventController.getEvent);
 
-router.post("/", isAuth, correctParticipantCount, eventController.postEvent);
+router.post("/", isAuth, validTimeStamps ,correctParticipantCount, eventController.postEvent);
 
 router.post(
   "/participate",
