@@ -12,7 +12,12 @@ function generateTokenPromises(count, size) {
   }
   return tokenPromiseArr;
 }
-async function generateParticipationIds(eventId, emailArr, size, expiration) {
+async function generateParticipationIds(
+  eventId,
+  emailArr,
+  size,
+  { expirationDate, expirationInSeconds }
+) {
   try {
     const count = emailArr.length;
     const tokenArr = await Promise.all(generateTokenPromises(count, size));
@@ -22,13 +27,14 @@ async function generateParticipationIds(eventId, emailArr, size, expiration) {
         new ParticipationToken({
           token: `PI-${eventId}-${tokenArr[i]}`,
           recipient: emailArr[i],
-          expiration
+          eventId,
+          expiration: expirationDate
         })
       );
     }
     // save the tokens in redis and mongodb
     participationTokens.forEach(({ token, recipient }) => {
-      redisClient.set(token, recipient, "EX", expiration);
+      redisClient.set(token, recipient, "EX", expirationInSeconds);
     });
     return await ParticipationToken.insertMany(participationTokens);
   } catch (error) {
@@ -49,10 +55,4 @@ module.exports = async (event, sender, emailArr, tokenExpiration) => {
     htmlArr.push(genHtml(savedParticipationTokens[i].token));
   }
   sendEmail(emailArr, subject, htmlArr);
-  // emailArr.forEach(emailAddress => {
-  // const html = `<p><strong>This is your unique id for the event: ${participationId}</strong></p>
-  //   <p><strong>PLEASE MAKE SURE YOU DO NOT SHARE THIS WITH ANYONE!</strong></p>
-  // `;
-  //   sendEmail(emailAddress, subject, html);
-  // });
 };

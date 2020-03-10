@@ -1,3 +1,6 @@
 module.exports = (start, end) => {
-  return (end.getTime() - start.getTime()) / 1000;
+  return {
+    expirationDate: end,
+    expirationInSeconds: end.getTime() / 1000
+  };
 };

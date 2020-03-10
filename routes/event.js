@@ -16,10 +16,17 @@ router.get("/all", eventController.getAllEvent);
 
 router.get("/created", isAuth, eventController.getCreatedEvents);
 
+router.get("/invited", isAuth, eventController.getInvitedEvents);
+
 router.get("/:eventId", eventController.getEvent);
 
-router.post("/", isAuth, validTimeStamps ,correctParticipantCount, eventController.postEvent);
-
+router.post(
+  "/",
+  isAuth,
+  validTimeStamps,
+  correctParticipantCount,
+  eventController.postEvent
+);
 
 router.post(
   "/participate",

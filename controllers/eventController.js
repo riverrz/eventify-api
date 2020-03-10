@@ -1,4 +1,5 @@
 const Event = require("../models/Event");
+const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
@@ -42,6 +43,20 @@ exports.getCreatedEvents = async (req, res, next) => {
       .in(req.user.events)
       .exec();
     res.json(createdEvents);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getInvitedEvents = async (req, res, next) => {
+  try {
+    const invitedEvents = await ParticipationToken.find({
+      recipient: req.user.email,
+      expiration: { $gte: Date.now() }
+    })
+      .populate("event", "-participants -_id")
+      .exec();
+    res.json(invitedEvents);
   } catch (error) {
     next(error);
   }

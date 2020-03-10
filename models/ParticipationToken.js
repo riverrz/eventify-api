@@ -5,11 +5,17 @@ const participationTokenSchema = new Schema(
   {
     token: {
       type: String,
-      required: true
+      required: true,
+      index: true
+    },
+    eventId: {
+      type: String,
+      required: true,
     },
     recipient: {
       type: "String",
-      required: true
+      required: true,
+      index: true
     },
     expiration: {
       type: Date,
@@ -17,8 +23,17 @@ const participationTokenSchema = new Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
   }
 );
+
+participationTokenSchema.virtual("event", {
+  ref: "Event",
+  localField: "eventId",
+  foreignField: "eventId",
+  justOne: true
+})
 
 module.exports = new model("ParticipationToken", participationTokenSchema);
