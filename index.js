@@ -1,7 +1,8 @@
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-require('dotenv').config()
+require("dotenv").config();
 const { redisInit } = require("./config/redisConfig");
 
 const app = express();
@@ -16,7 +17,7 @@ const eventRoutes = require("./routes/event");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/event", eventRoutes);
 
@@ -30,7 +31,12 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(
   keys.DB_URI,
-  { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: true },
+  {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: true
+  },
   err => {
     if (err) {
       throw err;

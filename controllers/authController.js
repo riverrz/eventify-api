@@ -41,8 +41,10 @@ exports.postRegister = async (req, res, next) => {
         try {
           const user = new User(userObj);
           await user.save();
+          const token = await genToken({ userId: user.userId });
           res.status(201).json({
-            success: true
+            token,
+            user
           });
         } catch (error) {
           next(error);
@@ -76,7 +78,7 @@ exports.postLogin = async (req, res, next) => {
         return next(error);
       }
       const token = await genToken({ userId: user.userId });
-      res.json({ success: true, token });
+      res.json({ token, user });
     });
   } catch (error) {
     next(error);
