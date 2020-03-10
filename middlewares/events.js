@@ -22,7 +22,13 @@ exports.correctParticipantCount = (req, res, next) => {
   if (req.body.totalParticipantsAllowed != req.body.emailArr.length) {
     const error = new Error(
       "Total participants allowed and number of email ids provided must match"
-    );
+    )
+    error.statusCode = 401;
+    return next(error);
+  } else if (req.body.totalParticipantsAllowed > 100) {
+    const error = new Error(
+      "Total participants cannot be greater than 100!"
+    )
     error.statusCode = 401;
     return next(error);
   }

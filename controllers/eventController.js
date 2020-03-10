@@ -24,6 +24,17 @@ exports.getEvent = async (req, res, next) => {
   }
 };
 
+exports.getAllEvent = async (req, res, next) => {
+  try {
+    const foundEvent = await Event.find()
+      .populate("creator", "username email userId -_id")
+      .exec();
+    res.json(foundEvent);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.postEvent = async (req, res, next) => {
   try {
     const eventObject = {

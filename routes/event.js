@@ -12,9 +12,12 @@ const {
   validTimeStamps
 } = require("../middlewares/events");
 
+router.get("/all", eventController.getAllEvent);
+
 router.get("/:eventId", eventController.getEvent);
 
 router.post("/", isAuth, validTimeStamps ,correctParticipantCount, eventController.postEvent);
+
 
 router.post(
   "/participate",
