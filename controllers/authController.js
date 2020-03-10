@@ -1,13 +1,16 @@
+const { pick } = require("ramda");
 const User = require("../models/User");
 const bcrypt = require("bcrypt-nodejs");
 const { genToken } = require("../helpers/jwtToken");
+
+const userFieldsToSend = ["email", "username", "userId"];
 
 exports.getCurrent = (req, res, next) => {
   if (!req.user) {
     const error = new Error("An error occurred");
     return next(error);
   }
-  res.json(req.user);
+  res.json(pick(userFieldsToSend, req.user));
 };
 
 exports.postRegister = async (req, res, next) => {
@@ -44,7 +47,7 @@ exports.postRegister = async (req, res, next) => {
           const token = await genToken({ userId: user.userId });
           res.status(201).json({
             token,
-            user
+            user: pick(userFieldsToSend, user)
           });
         } catch (error) {
           next(error);
@@ -78,7 +81,7 @@ exports.postLogin = async (req, res, next) => {
         return next(error);
       }
       const token = await genToken({ userId: user.userId });
-      res.json({ token, user });
+      res.json({ token, user: pick(userFieldsToSend, user) });
     });
   } catch (error) {
     next(error);

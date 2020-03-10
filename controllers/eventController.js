@@ -52,7 +52,6 @@ exports.postEvent = async (req, res, next) => {
     );
 
     res.status(201).json({
-      success: true,
       eventId: newEvent.eventId
     });
   } catch (error) {
@@ -77,7 +76,7 @@ exports.postParticipate = async (req, res, next) => {
 
     foundEvent.participants.push(req.user._id);
     await foundEvent.save();
-    
+
     res.json({
       success: true
     });
