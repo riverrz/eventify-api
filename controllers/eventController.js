@@ -35,6 +35,18 @@ exports.getAllEvent = async (req, res, next) => {
   }
 };
 
+exports.getCreatedEvents = async (req, res, next) => {
+  try {
+    const createdEvents = await Event.find()
+      .where("_id")
+      .in(req.user.events)
+      .exec();
+    res.json(createdEvents);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.postEvent = async (req, res, next) => {
   try {
     const eventObject = {

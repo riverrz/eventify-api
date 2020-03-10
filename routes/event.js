@@ -14,6 +14,8 @@ const {
 
 router.get("/all", eventController.getAllEvent);
 
+router.get("/created", isAuth, eventController.getCreatedEvents);
+
 router.get("/:eventId", eventController.getEvent);
 
 router.post("/", isAuth, validTimeStamps ,correctParticipantCount, eventController.postEvent);
