@@ -12,7 +12,7 @@ const {
   validTimeStamps
 } = require("../middlewares/events");
 
-router.get("/all", eventController.getAllEvent);
+router.get("/all", isAuth, eventController.getAllEvent);
 
 router.get("/created", isAuth, eventController.getCreatedEvents);
 

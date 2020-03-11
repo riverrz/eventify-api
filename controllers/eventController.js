@@ -1,8 +1,35 @@
+const { map, prop } = require('ramda');
 const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
+
+async function getCreatedEvents(events) {
+  try {
+    const createdEvents = await Event.find()
+      .where("_id")
+      .in(events)
+      .exec();
+    return createdEvents;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getInvitedEvents(email) {
+  try {
+    const tokens = await ParticipationToken.find({
+      recipient: email,
+      expiration: { $gte: Date.now() }
+    }).select("eventId");
+    const eventIds = map(prop('eventId'), tokens);
+    const invitedEvents = await Event.find().where("eventId").in(eventIds).exec();
+    return invitedEvents;
+  } catch (error) {
+    throw error;
+  }
+}
 
 exports.getEvent = async (req, res, next) => {
   try {
@@ -27,10 +54,15 @@ exports.getEvent = async (req, res, next) => {
 
 exports.getAllEvent = async (req, res, next) => {
   try {
-    const foundEvent = await Event.find()
-      .populate("creator", "username email userId -_id")
-      .exec();
-    res.json(foundEvent);
+    const allEvents = await Promise.all([
+      getInvitedEvents(req.user.email),
+      getCreatedEvents(req.user.events)
+    ]);
+    const allEventsObj = {
+      invitedEvents: allEvents[0],
+      createdEvents: allEvents[1]
+    };
+    res.json(allEventsObj);
   } catch (error) {
     next(error);
   }
@@ -38,10 +70,7 @@ exports.getAllEvent = async (req, res, next) => {
 
 exports.getCreatedEvents = async (req, res, next) => {
   try {
-    const createdEvents = await Event.find()
-      .where("_id")
-      .in(req.user.events)
-      .exec();
+    const createdEvents = await getCreatedEvents(req.user.events);
     res.json(createdEvents);
   } catch (error) {
     next(error);
@@ -50,12 +79,7 @@ exports.getCreatedEvents = async (req, res, next) => {
 
 exports.getInvitedEvents = async (req, res, next) => {
   try {
-    const invitedEvents = await ParticipationToken.find({
-      recipient: req.user.email,
-      expiration: { $gte: Date.now() }
-    })
-      .populate("event", "-participants -_id")
-      .exec();
+    const invitedEvents = await getInvitedEvents(req.user.email);
     res.json(invitedEvents);
   } catch (error) {
     next(error);
