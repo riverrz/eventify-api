@@ -18,7 +18,7 @@ router.get("/created", isAuth, eventController.getCreatedEvents);
 
 router.get("/invited", isAuth, eventController.getInvitedEvents);
 
-router.get("/:eventId", isAuth, eventController.getEvent);
+router.get("/:eventId", eventController.getEvent);
 
 router.post(
   "/",
