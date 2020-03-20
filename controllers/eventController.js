@@ -1,4 +1,4 @@
-const { map, prop } = require('ramda');
+const { map, prop } = require("ramda");
 const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
@@ -10,6 +10,9 @@ async function getCreatedEvents(events) {
     const createdEvents = await Event.find()
       .where("_id")
       .in(events)
+      .select(
+        "title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+      )
       .exec();
     return createdEvents;
   } catch (error) {
@@ -23,8 +26,14 @@ async function getInvitedEvents(email) {
       recipient: email,
       expiration: { $gte: Date.now() }
     }).select("eventId");
-    const eventIds = map(prop('eventId'), tokens);
-    const invitedEvents = await Event.find().where("eventId").in(eventIds).exec();
+    const eventIds = map(prop("eventId"), tokens);
+    const invitedEvents = await Event.find()
+      .where("eventId")
+      .in(eventIds)
+      .select(
+        "title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+      )
+      .exec();
     return invitedEvents;
   } catch (error) {
     throw error;
@@ -35,7 +44,7 @@ exports.getEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const foundEvent = await Event.findOne({ eventId })
-      .select("creatorId creator startTimeStamp endTimeStamp eventId -_id")
+      .select("-_id")
       .populate("creator", "username email userId -_id")
       .exec();
     if (!foundEvent) {
@@ -94,7 +103,8 @@ exports.postEvent = async (req, res, next) => {
       endTimeStamp: new Date(req.body.endTimeStamp),
       totalParticipantsAllowed: req.body.totalParticipantsAllowed,
       title: req.body.title,
-      description: req.body.description
+      description: req.body.description,
+      banner: req.body.banner
     };
     // Create and save event
     const newEvent = new Event(eventObject);
