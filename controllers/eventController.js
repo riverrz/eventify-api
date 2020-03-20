@@ -11,7 +11,7 @@ async function getCreatedEvents(events) {
       .where("_id")
       .in(events)
       .select(
-        "title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+        "eventId title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
       )
       .exec();
     return createdEvents;
@@ -31,7 +31,7 @@ async function getInvitedEvents(email) {
       .where("eventId")
       .in(eventIds)
       .select(
-        "title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+        "eventId title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
       )
       .exec();
     return invitedEvents;
