@@ -53,7 +53,6 @@ exports.getEvent = async (req, res, next) => {
       return next(error);
     }
     res.json({
-      success: true,
       event: foundEvent
     });
   } catch (error) {
