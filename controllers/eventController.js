@@ -23,8 +23,7 @@ async function getCreatedEvents(events) {
 async function getInvitedEvents(email) {
   try {
     const tokens = await ParticipationToken.find({
-      recipient: email,
-      expiration: { $gte: Date.now() }
+      recipient: email
     }).select("eventId");
     const eventIds = map(prop("eventId"), tokens);
     const invitedEvents = await Event.find()
@@ -52,9 +51,7 @@ exports.getEvent = async (req, res, next) => {
       error.statusCode = 404;
       return next(error);
     }
-    res.json({
-      event: foundEvent
-    });
+    res.json(foundEvent);
   } catch (error) {
     next(error);
   }
@@ -134,13 +131,13 @@ exports.postParticipate = async (req, res, next) => {
   try {
     const foundEvent = await Event.findOne({ eventId: req.body.eventId });
     if (!foundEvent) {
-      const error = new Error("Invalid participation token");
+      const error = new Error("Invalid participation token!");
       error.statusCode = 403;
       return next(error);
     }
     // check if user has already confirmed his seat for the event
     if (foundEvent.participants.includes(req.user._id.toString())) {
-      const error = new Error("You have already confirmed your seat");
+      const error = new Error("You have already confirmed your seat!");
       error.statusCode = 403;
       return next(error);
     }
@@ -148,9 +145,7 @@ exports.postParticipate = async (req, res, next) => {
     foundEvent.participants.push(req.user._id);
     await foundEvent.save();
 
-    res.json({
-      success: true
-    });
+    res.json(true);
   } catch (error) {
     next(error);
   }
