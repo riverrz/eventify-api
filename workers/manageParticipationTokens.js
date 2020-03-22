@@ -32,11 +32,12 @@ async function generateParticipationIds(
         })
       );
     }
+    await ParticipationToken.insertMany(participationTokens);
     // save the tokens in redis and mongodb
-    participationTokens.forEach(({ token, recipient }) => {
-      redisClient.set(token, recipient, "EX", expirationInSeconds);
+    const promiseArr = participationTokens.map(({ token, recipient }) => {
+      return redisClient.set(token, recipient, "EX", expirationInSeconds);
     });
-    return await ParticipationToken.insertMany(participationTokens);
+    return await Promise.all(promiseArr);
   } catch (error) {
     throw error;
   }
