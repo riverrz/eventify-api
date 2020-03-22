@@ -5,6 +5,9 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 require("dotenv").config();
 const { redisInit } = require("./config/redisConfig");
+const authRoutes = require("./routes/auth");
+const eventRoutes = require("./routes/event");
+const tokenRoutes = require("./routes/token");
 
 const app = express();
 redisInit();
@@ -13,14 +16,13 @@ const keys = require("./keys/keys");
 
 const PORT = process.env.PORT || 5000;
 
-const authRoutes = require("./routes/auth");
-const eventRoutes = require("./routes/event");
 app.use(morgan("combined"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/event", eventRoutes);
+app.use("/token", tokenRoutes);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
