@@ -3,7 +3,6 @@ const generateRandomToken = require("../helpers/generateRandomToken");
 const generateHTMLContent = require("../helpers/generateHTMLContent");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
-const redisClient = getClient();
 
 function generateTokenPromises(count, size) {
   const tokenPromiseArr = [];
@@ -34,6 +33,7 @@ async function generateParticipationIds(
     }
     await ParticipationToken.insertMany(participationTokens);
     // save the tokens in redis and mongodb
+    const redisClient = getClient();
     const promiseArr = participationTokens.map(({ token, recipient }) => {
       return redisClient.set(token, recipient, "EX", expirationInSeconds);
     });

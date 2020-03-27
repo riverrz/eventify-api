@@ -1,6 +1,5 @@
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
-const redisClient = getClient();
 
 exports.validTimeStamps = (req, res, next) => {
   const { startTimeStamp, endTimeStamp } = req.body;
@@ -60,6 +59,7 @@ exports.validateParticipationToken = async (req, res, next) => {
   // check if the token is present in redis first
   try {
     try {
+      const redisClient = getClient();
       const recipient = await redisClient.getAsync(token);
       if (recipient && recipient === req.user.email) {
         return next();
