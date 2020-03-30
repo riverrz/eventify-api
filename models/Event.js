@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const generateRandomToken = require("../helpers/generateRandomToken");
+const { moduleSchema } = require("./Module");
 
 const eventSchema = new mongoose.Schema(
   {
@@ -35,7 +36,10 @@ const eventSchema = new mongoose.Schema(
       type: Number,
       default: 1
     },
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    components: {
+      type: [moduleSchema]
+    }
   },
   {
     timestamps: true,
