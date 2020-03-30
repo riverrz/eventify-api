@@ -8,6 +8,7 @@ const { redisInit } = require("./config/redisConfig");
 const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/event");
 const tokenRoutes = require("./routes/token");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 redisInit();
@@ -23,6 +24,7 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/event", eventRoutes);
 app.use("/token", tokenRoutes);
+app.use("/admin", adminRoutes);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
