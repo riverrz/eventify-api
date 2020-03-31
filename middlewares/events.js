@@ -1,3 +1,4 @@
+const { isEmpty, propOr, isNil } = require("ramda");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 
@@ -78,6 +79,33 @@ exports.validateParticipationToken = async (req, res, next) => {
     );
     error.statusCode = 403;
     throw error;
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.validateModules = async (req, res, next) => {
+  try {
+    const modules = propOr([], "modules", req.body);
+    if (isEmpty(modules)) {
+      return next();
+    }
+    const redisClient = getClient();
+    const promiseArr = modules.map(
+      async moduleId =>
+        new Promise((resolve, reject) => {
+          redisClient.hgetall(moduleId, function(err, value) {
+            if (err) {
+              return reject(err);
+            } else if (isNil(value)) {
+              return reject(new Error("Invalid module id!"));
+            }
+            return resolve(value);
+          });
+        })
+    );
+    await Promise.all(promiseArr);
+    next();
   } catch (error) {
     next(error);
   }

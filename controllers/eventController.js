@@ -100,7 +100,8 @@ exports.postEvent = async (req, res, next) => {
       totalParticipantsAllowed: req.body.totalParticipantsAllowed,
       title: req.body.title,
       description: req.body.description,
-      banner: req.body.banner
+      banner: req.body.banner,
+      modules: req.body.modules 
     };
     // Create and save event
     const newEvent = new Event(eventObject);

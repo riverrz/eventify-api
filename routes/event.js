@@ -9,7 +9,8 @@ const {
   correctParticipantCount,
   splitParticipationToken,
   validateParticipationToken,
-  validTimeStamps
+  validTimeStamps,
+  validateModules
 } = require("../middlewares/events");
 
 router.get("/all", isAuth, eventController.getAllEvent);
@@ -25,6 +26,7 @@ router.post(
   isAuth,
   validTimeStamps,
   correctParticipantCount,
+
   eventController.postEvent
 );
 
@@ -33,6 +35,7 @@ router.post(
   isAuth,
   validateParticipationToken,
   splitParticipationToken,
+  validateModules,
   eventController.postParticipate
 );
 
