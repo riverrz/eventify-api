@@ -10,6 +10,8 @@ const eventRoutes = require("./routes/event");
 const tokenRoutes = require("./routes/token");
 const adminRoutes = require("./routes/admin");
 
+const loadModulesInRedis = require("./helpers/loadModulesInRedis");
+
 const app = express();
 redisInit();
 
@@ -48,6 +50,7 @@ mongoose.connect(
     }
     console.log("DB connected");
     app.listen(PORT, () => {
+      loadModulesInRedis();
       console.log(`Server has started on Port ${PORT}`);
     });
   }
