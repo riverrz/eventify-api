@@ -27,6 +27,5 @@ moduleSchema.pre("save", async function() {
   }
 });
 
-exports.moduleSchema = moduleSchema;
 
 module.exports = new mongoose.model("Module", moduleSchema)
