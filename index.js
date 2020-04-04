@@ -9,6 +9,8 @@ const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/event");
 const tokenRoutes = require("./routes/token");
 const adminRoutes = require("./routes/admin");
+const userRoutes = require("./routes/user");
+
 const callBackRoutes = require("./routes/callBack");
 
 const loadModulesInRedis = require("./helpers/loadModulesInRedis");
@@ -28,6 +30,7 @@ app.use("/auth", authRoutes);
 app.use("/event", eventRoutes);
 app.use("/token", tokenRoutes);
 app.use("/admin", adminRoutes);
+app.use("/user", userRoutes);
 app.use("/callback", callBackRoutes);
 
 

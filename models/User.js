@@ -45,4 +45,12 @@ userSchema.pre("save", async function () {
   }
 });
 
+userSchema.methods.updateBalance = async function(newBalance) {
+  if (newBalance < 0) {
+    throw new Error("Invalid balance amount.");
+  }
+  this.balance = Number(newBalance);
+  await this.save();
+};
+
 module.exports = new mongoose.model("User", userSchema);
