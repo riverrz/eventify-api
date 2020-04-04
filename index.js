@@ -9,13 +9,14 @@ const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/event");
 const tokenRoutes = require("./routes/token");
 const adminRoutes = require("./routes/admin");
+const callBackRoutes = require("./routes/callBack");
 
 const loadModulesInRedis = require("./helpers/loadModulesInRedis");
 
 const app = express();
 redisInit();
 
-const keys = require("./keys/keys");
+const keys = require("./keys");
 
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +28,8 @@ app.use("/auth", authRoutes);
 app.use("/event", eventRoutes);
 app.use("/token", tokenRoutes);
 app.use("/admin", adminRoutes);
+app.use("/callback", callBackRoutes);
+
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

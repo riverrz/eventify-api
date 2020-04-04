@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const keys = require("../keys/keys");
+const keys = require("../keys");
 
 exports.genToken = function(payload) {
   return new Promise(function(resolve, reject) {
