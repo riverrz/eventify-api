@@ -1,3 +1,6 @@
+const Order = require("../models/Order");
+const User = require("../models/User");
+
 const fetch = require("node-fetch");
 const { verifychecksum } = require("../config/checksum");
 const generateTXNMessage = require("../helpers/generateTXNMessage");
@@ -49,33 +52,20 @@ exports.postHandleTransaction = async (req, res, next) => {
         return res.json(txnResultObj);
       }
 
-      // Find the Student to update the balance.
-      const foundStudent = await Student.findOne({
-        studentId: foundOrder.sender
+      // Find the User to update the balance.
+      const foundUser = await User.findOne({
+        userId: foundOrder.author
       });
-      if (!foundStudent) {
-        const error = new Error("Student id received in order is invalid!");
+      if (!foundUser) {
+        const error = new Error("User id received in order is invalid!");
         error.statusCode = 404;
         return next(error);
       }
-
-      // Initialise the newStudentBalance(used for updation) variable with current balance.
-      let newStudentBalance = foundStudent.balance;
-
-      // Update the Student's balance appropriately.
-      // Check whether the vendor is Prime Vendor.
-      const isPrimeVendor = await PrimeVendor.findOne({
-        vendorId: foundOrder.receiver
-      });
-
-      // If primeVendor (i.e. it must be for adding money), then add the equivalent SCoins.
-      if (isPrimeVendor) {
-        // Get equivalent amount of SCoins based on order's totalPrice(i.e how much money to be added).
-        newStudentBalance += foundOrder.totalPrice;
-      }
+      // New user balance
+      const newBalance = foundUser.balance + Number(foundOrder.totalPrice);
 
       // Update the balance
-      await foundStudent.updateBalance(newStudentBalance);
+      await foundUser.updateBalance(newBalance);
 
       // Send response to client based on RESPCODE
       res.json(txnResultObj);
