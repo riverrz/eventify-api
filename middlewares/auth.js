@@ -9,7 +9,7 @@ exports.isAuth = async (req, res, next) => {
       return next(error);
     }
     const user = await User.findOne({ userId: payload.userId }).select(
-      "username email userId _id events"
+      "username email userId _id events balance"
     );
     if (!user) {
       const error = new Error("Invalid token");
