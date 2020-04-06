@@ -68,7 +68,7 @@ exports.postHandleTransaction = async (req, res, next) => {
       await foundUser.updateBalance(newBalance);
 
       // Send response to client based on RESPCODE
-      res.redirect(keys.CLIENT_URL);
+      res.redirect(`${keys.CLIENT_URL}/dashboard?wallet_txn_status=SUCCESS`);
     } catch (error) {
       next(error);
     }
