@@ -22,7 +22,6 @@ exports.patchBalance = async (req, res, next) => {
       MID: keys.MID,
       CHANNEL_ID: keys.CHANNEL_ID,
       WEBSITE: keys.WEBSITE,
-      MOBILE_NO: req.user.phone,
       EMAIL: req.user.email,
       INDUSTRY_TYPE_ID: keys.INDUSTRY_TYPE_ID,
       CALLBACK_URL: keys.CALLBACK_URL,

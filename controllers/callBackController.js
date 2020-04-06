@@ -17,19 +17,19 @@ exports.postHandleTransaction = async (req, res, next) => {
       const statusObj = await fetch(keys.PAYTM_STATUS_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           MID: keys.MID,
           ORDERID: responseBody.ORDERID,
-          CHECKSUMHASH: responseBody.CHECKSUMHASH
-        })
-      }).then(res => res.json());
+          CHECKSUMHASH: responseBody.CHECKSUMHASH,
+        }),
+      }).then((res) => res.json());
       const { TXNID, BANKTXNID, TXNDATE, STATUS } = statusObj;
 
       // Update the order's details.
       const foundOrder = await Order.findOne({
-        orderId: statusObj.ORDERID
+        orderId: statusObj.ORDERID,
       });
       if (!foundOrder) {
         const error = new Error("Order not found!");
@@ -54,7 +54,7 @@ exports.postHandleTransaction = async (req, res, next) => {
 
       // Find the User to update the balance.
       const foundUser = await User.findOne({
-        userId: foundOrder.author
+        userId: foundOrder.author,
       });
       if (!foundUser) {
         const error = new Error("User id received in order is invalid!");
@@ -68,7 +68,7 @@ exports.postHandleTransaction = async (req, res, next) => {
       await foundUser.updateBalance(newBalance);
 
       // Send response to client based on RESPCODE
-      res.json(txnResultObj);
+      res.redirect(keys.CLIENT_URL);
     } catch (error) {
       next(error);
     }

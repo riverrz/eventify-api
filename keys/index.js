@@ -10,5 +10,6 @@ module.exports = {
   CHANNEL_ID: process.env.CHANNEL_ID,
   INDUSTRY_TYPE_ID: process.env.INDUSTRY_TYPE_ID,
   WEBSITE: process.env.WEBSITE,
-  CALLBACK_URL: process.env.CALLBACK_URL
+  CALLBACK_URL: process.env.CALLBACK_URL,
+  CLIENT_URL: process.env.CLIENT_URL,
 };
