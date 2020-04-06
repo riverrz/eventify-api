@@ -3,7 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt-nodejs");
 const { genToken } = require("../helpers/jwtToken");
 
-const userFieldsToSend = ["email", "username", "userId"];
+const userFieldsToSend = ["email", "username", "userId", "balance"];
 
 exports.getCurrent = (req, res, next) => {
   if (!req.user) {
