@@ -34,10 +34,10 @@ async function generateParticipationIds(
     await ParticipationToken.insertMany(participationTokens);
     // save the tokens in redis and mongodb
     const redisClient = getClient();
-    const promiseArr = participationTokens.map(({ token, recipient }) => {
-      return redisClient.set(token, recipient, "EX", expirationInSeconds);
+    participationTokens.forEach(({ token, recipient }) => {
+      redisClient.set(token, recipient, "EX", expirationInSeconds);
     });
-    return await Promise.all(promiseArr);
+    return participationTokens;
   } catch (error) {
     throw error;
   }
