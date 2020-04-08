@@ -10,8 +10,8 @@ module.exports = (
                 <ul>
                     <li>Title: ${title}</li>
                     <li>Description: ${description}</li>
-                    <li>Start Date: ${startTimeStamp.toDateString()}</li>
-                    <li>End Date: ${endTimeStamp.toDateString()}</li>
+                    <li>Start Date: ${startTimeStamp.toLocaleString()}</li>
+                    <li>End Date: ${endTimeStamp.toLocaleString()}</li>
                 </ul>
             </div>
             <p>Your unique participation id for the event is: </p>
