@@ -2,6 +2,7 @@ const { map, prop } = require("ramda");
 const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
+const Modules = require("../models/Module");
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
@@ -23,7 +24,7 @@ async function getCreatedEvents(events) {
 async function getInvitedEvents(email) {
   try {
     const tokens = await ParticipationToken.find({
-      recipient: email
+      recipient: email,
     }).select("eventId");
     const eventIds = map(prop("eventId"), tokens);
     const invitedEvents = await Event.find()
@@ -61,11 +62,11 @@ exports.getAllEvent = async (req, res, next) => {
   try {
     const allEvents = await Promise.all([
       getInvitedEvents(req.user.email),
-      getCreatedEvents(req.user.events)
+      getCreatedEvents(req.user.events),
     ]);
     const allEventsObj = {
       invitedEvents: allEvents[0],
-      createdEvents: allEvents[1]
+      createdEvents: allEvents[1],
     };
     res.json(allEventsObj);
   } catch (error) {
@@ -101,7 +102,7 @@ exports.postEvent = async (req, res, next) => {
       title: req.body.title,
       description: req.body.description,
       banner: req.body.banner,
-      modules: req.body.modules 
+      modules: req.body.modules,
     };
     // Create and save event
     const newEvent = new Event(eventObject);
@@ -121,7 +122,7 @@ exports.postEvent = async (req, res, next) => {
     );
 
     res.status(201).json({
-      eventId: newEvent.eventId
+      eventId: newEvent.eventId,
     });
   } catch (error) {
     next(error);
@@ -147,6 +148,15 @@ exports.postParticipate = async (req, res, next) => {
     await foundEvent.save();
 
     res.json(true);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getModules = async (req, res, next) => {
+  try {
+    const data = await Modules.find({}).select("name moduleId -_id");
+    res.json(data);
   } catch (error) {
     next(error);
   }
