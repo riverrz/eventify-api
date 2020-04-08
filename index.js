@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 require("dotenv").config();
+const Agenda = require("./agenda");
 const { redisInit } = require("./config/redisConfig");
 const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/event");
@@ -33,12 +34,11 @@ app.use("/admin", adminRoutes);
 app.use("/user", userRoutes);
 app.use("/callback", callBackRoutes);
 
-
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   res.status(statusCode).json({
     error: true,
-    message: error.message
+    message: error.message,
   });
 });
 
@@ -48,15 +48,16 @@ mongoose.connect(
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
-    useFindAndModify: false
+    useFindAndModify: false,
   },
-  err => {
+  (err) => {
     if (err) {
       throw err;
     }
     console.log("DB connected");
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       loadModulesInRedis();
+      await Agenda.start();
       console.log(`Server has started on Port ${PORT}`);
     });
   }
