@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 require("dotenv").config();
 const Agenda = require("./agenda");
+const InitJobs = require("./agenda/jobs");
 const { redisInit } = require("./config/redisConfig");
 const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/event");
@@ -36,6 +37,7 @@ app.use("/callback", callBackRoutes);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
+  console.log(error.message);
   res.status(statusCode).json({
     error: true,
     message: error.message,
@@ -58,6 +60,7 @@ mongoose.connect(
     app.listen(PORT, async () => {
       loadModulesInRedis();
       await Agenda.start();
+      InitJobs(Agenda);
       console.log(`Server has started on Port ${PORT}`);
     });
   }
