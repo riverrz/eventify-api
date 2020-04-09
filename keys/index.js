@@ -13,4 +13,6 @@ module.exports = {
   CALLBACK_URL: process.env.CALLBACK_URL,
   CLIENT_URL: process.env.CLIENT_URL,
   AGENDA_COLLECTION_NAME: process.env.AGENDA_COLLECTION_NAME,
+  NODE_ENV: process.env.NODE_ENV,
+  SELF: process.env.SELF,
 };

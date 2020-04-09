@@ -1,6 +1,6 @@
-const sendEmail = require("../helpers/sendEmail");
+const { sendEmail } = require("../helpers/sendEmail");
 const generateRandomToken = require("../helpers/generateRandomToken");
-const generateHTMLContent = require("../helpers/generateHTMLContent");
+const { newEventEmailContent } = require("../helpers/generateHTMLContent");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 
@@ -27,7 +27,7 @@ async function generateParticipationIds(
           token: `PI-${eventId}-${tokenArr[i]}`,
           recipient: emailArr[i],
           eventId,
-          expiration: expirationDate
+          expiration: expirationDate,
         })
       );
     }
@@ -50,7 +50,7 @@ module.exports = async (event, sender, emailArr, tokenExpiration) => {
     2,
     tokenExpiration
   );
-  const { subject, genHtml } = generateHTMLContent(event, sender);
+  const { subject, genHtml } = newEventEmailContent(event, sender);
   const htmlArr = [];
   for (let i = 0; i < emailArr.length; i++) {
     htmlArr.push(genHtml(savedParticipationTokens[i].token));
