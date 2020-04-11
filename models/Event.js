@@ -40,6 +40,9 @@ const eventSchema = new mongoose.Schema(
     modules: {
       type: [String],
     },
+    metaData: {
+      type: mongoose.Schema.Types.Mixed,
+    },
   },
   {
     timestamps: true,
