@@ -8,6 +8,9 @@ module.exports = async function (agenda) {
       const { eventId } = job.attrs.data;
       await fetch(`${keys.SELF}/admin/sendreminders`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ eventId }),
       });
     });
