@@ -5,18 +5,21 @@ const moduleSchema = new mongoose.Schema({
   moduleId: {
     type: String,
     unique: true,
-    index: true
+    index: true,
   },
   name: {
     type: String,
-    unique: true
+    unique: true,
   },
   banner: {
-    type: String
-  }
+    type: String,
+  },
+  price: {
+    type: Number,
+  },
 });
 
-moduleSchema.pre("save", async function() {
+moduleSchema.pre("save", async function () {
   if (!this.moduleId) {
     try {
       const token = await generateRandomToken(2);
@@ -27,5 +30,4 @@ moduleSchema.pre("save", async function() {
   }
 });
 
-
-module.exports = new mongoose.model("Module", moduleSchema)
+module.exports = new mongoose.model("Module", moduleSchema);
