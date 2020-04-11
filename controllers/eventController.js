@@ -117,7 +117,7 @@ exports.postEvent = async (req, res, next) => {
     manageParticipationTokens(
       newEvent,
       req.user.username,
-      req.body.emailArr,
+      [...req.body.emailArr, req.user.email],
       calcExpirationInSeconds(newEvent.startTimeStamp, newEvent.endTimeStamp)
     );
 
