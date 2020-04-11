@@ -44,7 +44,7 @@ exports.getEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const foundEvent = await Event.findOne({ eventId })
-      .select("-data -_id")
+      .select("-content -_id")
       .populate("creator", "username email userId -_id")
       .exec();
     if (!foundEvent) {
@@ -103,7 +103,7 @@ exports.postEvent = async (req, res, next) => {
       description: req.body.description,
       banner: req.body.banner,
       modules: req.body.modules,
-      data: req.body.data
+      content: req.body.content
     };
     // Create and save event
     const newEvent = new Event(eventObject);
