@@ -2,6 +2,8 @@ const { isEmpty, propOr, isNil } = require("ramda");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 
+const typeOfEventsPossible = ["Contentful", "Generic", "Hosted"];
+
 exports.validTimeStamps = (req, res, next) => {
   const { startTimeStamp, endTimeStamp } = req.body;
   if (!startTimeStamp || !endTimeStamp) {
@@ -92,9 +94,9 @@ exports.validateModules = async (req, res, next) => {
     }
     const redisClient = getClient();
     const promiseArr = modules.map(
-      async moduleId =>
+      async (moduleId) =>
         new Promise((resolve, reject) => {
-          redisClient.hgetall(moduleId, function(err, value) {
+          redisClient.hgetall(moduleId, function (err, value) {
             if (err) {
               return reject(err);
             } else if (isNil(value)) {
@@ -109,4 +111,13 @@ exports.validateModules = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+exports.validTypeOfEvent = (req, res, next) => {
+  const { type } = req.body;
+  if (type && typeOfEventsPossible.includes(type)) {
+    return next();
+  }
+  const error = new Error("Invalid 'type' of event");
+  error.statusCode = 400;
+  next(error);
 };

@@ -40,6 +40,10 @@ const eventSchema = new mongoose.Schema(
     modules: {
       type: [String],
     },
+    type: {
+      type: String,
+      required: true,
+    },
     content: {
       type: mongoose.Schema.Types.Mixed,
     },
