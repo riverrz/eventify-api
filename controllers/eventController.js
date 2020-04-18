@@ -12,7 +12,7 @@ async function getCreatedEvents(events) {
       .where("_id")
       .in(events)
       .select(
-        "eventId title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+        "-_id -content -modules"
       )
       .exec();
     return createdEvents;
@@ -33,7 +33,7 @@ async function getInvitedEvents(email) {
       .where("eventId")
       .in(eventIds)
       .select(
-        "eventId title banner description startTimeStamp endTimeStamp totalParticipantsAllowed -_id"
+        "-_id -content -modules"
       )
       .exec();
     return invitedEvents;
@@ -46,7 +46,7 @@ exports.getEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const foundEvent = await Event.findOne({ eventId })
-      .select("-content -_id -participants")
+      .select("-content -_id -modules")
       .populate("creator", "username email userId -_id")
       .exec();
     if (!foundEvent) {
@@ -142,13 +142,13 @@ exports.postParticipate = async (req, res, next) => {
       return next(error);
     }
     // check if user has already confirmed his seat for the event
-    if (foundEvent.participants.includes(req.user._id.toString())) {
+    if (foundEvent.participants.includes(req.user.userId.toString())) {
       const error = new Error("You have already confirmed your seat!");
       error.statusCode = 403;
       return next(error);
     }
 
-    foundEvent.participants.push(req.user._id);
+    foundEvent.participants.push(req.user.userId);
     await foundEvent.save();
 
     res.json(true);
