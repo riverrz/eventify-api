@@ -27,7 +27,9 @@ async function getInvitedEvents(email) {
       recipient: email,
     }).select("eventId");
     const eventIds = map(prop("eventId"), tokens);
-    const invitedEvents = await Event.find()
+    const invitedEvents = await Event.find({
+      endTimeStamp: { $gte: new Date() },
+    })
       .where("eventId")
       .in(eventIds)
       .select(
@@ -44,7 +46,7 @@ exports.getEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const foundEvent = await Event.findOne({ eventId })
-      .select("-content -_id")
+      .select("-content -_id -participants")
       .populate("creator", "username email userId -_id")
       .exec();
     if (!foundEvent) {
