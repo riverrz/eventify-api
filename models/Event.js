@@ -47,6 +47,9 @@ const eventSchema = new mongoose.Schema(
     content: {
       type: mongoose.Schema.Types.Mixed,
     },
+    duration: {
+      type: Number, // in milliseconds
+    },
   },
   {
     timestamps: true,
@@ -64,6 +67,12 @@ eventSchema.pre("save", async function () {
     } catch (error) {
       throw error;
     }
+  }
+  if (!this.duration) {
+    this.duration = Math.abs(
+      new Date(this.endTimeStamp).getTime() -
+        new Date(this.startTimeStamp).getTime()
+    );
   }
 });
 
