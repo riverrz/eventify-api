@@ -112,9 +112,8 @@ exports.postEvent = async (req, res, next) => {
         "content",
         "type",
         "duration",
-      ]),
-      req.body
-    );
+      ])
+    )(req.body);
     // Create and save event
     const newEvent = new Event(eventObject);
     await newEvent.save();
