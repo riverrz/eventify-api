@@ -1,4 +1,4 @@
-const { map, prop } = require("ramda");
+const { map, prop, pick, evolve, compose, merge } = require("ramda");
 const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
@@ -6,14 +6,18 @@ const Modules = require("../models/Module");
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
+const eventTransformation = {
+  startTimeStamp: (date) => new Date(date),
+  endTimeStamp: (date) => new Date(date),
+  duration: (val) => val * 60 * 1000, // convert to milliseconds
+};
+
 async function getCreatedEvents(events) {
   try {
     const createdEvents = await Event.find()
       .where("_id")
       .in(events)
-      .select(
-        "-_id -content -modules"
-      )
+      .select("-_id -content -modules")
       .exec();
     return createdEvents;
   } catch (error) {
@@ -32,9 +36,7 @@ async function getInvitedEvents(email) {
     })
       .where("eventId")
       .in(eventIds)
-      .select(
-        "-_id -content -modules"
-      )
+      .select("-_id -content -modules")
       .exec();
     return invitedEvents;
   } catch (error) {
@@ -96,18 +98,23 @@ exports.getInvitedEvents = async (req, res, next) => {
 
 exports.postEvent = async (req, res, next) => {
   try {
-    const eventObject = {
-      creatorId: req.user.userId,
-      startTimeStamp: new Date(req.body.startTimeStamp),
-      endTimeStamp: new Date(req.body.endTimeStamp),
-      totalParticipantsAllowed: req.body.totalParticipantsAllowed,
-      title: req.body.title,
-      description: req.body.description,
-      banner: req.body.banner,
-      modules: req.body.modules,
-      content: req.body.content,
-      type: req.body.type,
-    };
+    const eventObject = compose(
+      evolve(eventTransformation),
+      merge({ creatorId: req.user.userId }),
+      pick([
+        "startTimeStamp",
+        "endTimeStamp",
+        "totalParticipantsAllowed",
+        "title",
+        "description",
+        "banner",
+        "modules",
+        "content",
+        "type",
+        "duration",
+      ]),
+      req.body
+    );
     // Create and save event
     const newEvent = new Event(eventObject);
     await newEvent.save();
