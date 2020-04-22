@@ -11,7 +11,8 @@ const {
   validateParticipationToken,
   validTimeStamps,
   validateModules,
-  validTypeOfEvent
+  validTypeOfEvent,
+  isParticipant,
 } = require("../middlewares/events");
 
 router.get("/all", isAuth, eventController.getAllEvent);
@@ -21,6 +22,13 @@ router.get("/created", isAuth, eventController.getCreatedEvents);
 router.get("/invited", isAuth, eventController.getInvitedEvents);
 
 router.get("/modules", isAuth, eventController.getModules);
+
+router.post(
+  "/start/:eventId",
+  isAuth,
+  isParticipant,
+  eventController.postStartEvent
+);
 
 router.get("/:eventId", eventController.getEvent);
 

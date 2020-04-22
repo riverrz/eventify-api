@@ -171,3 +171,13 @@ exports.getModules = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.postStartEvent = async (req, res, next) => {
+  try {
+    const { timeStamp } = req.body;
+    // create a room for the user in the namespace of eventId
+    // emit message to synchronise the time
+  } catch (error) {
+    next(error);
+  }
+}

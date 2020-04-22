@@ -1,6 +1,7 @@
 const { isEmpty, propOr, isNil } = require("ramda");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
+const Event = require("../models/Event");
 
 const typeOfEventsPossible = ["Contentful", "Generic", "Hosted"];
 
@@ -120,4 +121,26 @@ exports.validTypeOfEvent = (req, res, next) => {
   const error = new Error("Invalid 'type' of event");
   error.statusCode = 400;
   next(error);
+};
+exports.isParticipant = async (req, res, next) => {
+  try {
+    const eventId = req.params.eventId;
+    const foundEvent = await Event.findOne({ eventId });
+    if (!foundEvent) {
+      const error = new Error("Invalid eventId");
+      error.statusCode = 401;
+      throw error;
+    }
+    if (!foundEvent.participants.includes(req.user.userId)) {
+      const error = new Error(
+        "You have not confirmed your participation for this event!"
+      );
+      error.statusCode = 403;
+      throw error;
+    }
+    req.event = foundEvent;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
