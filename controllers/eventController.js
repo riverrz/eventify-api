@@ -3,7 +3,11 @@ const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
 const Modules = require("../models/Module");
+const WebSocket = require("../websockets");
+
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
+const PersistentTimer = require("../workers/PersistentTimer");
+
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
 const eventTransformation = {
@@ -175,9 +179,24 @@ exports.getModules = async (req, res, next) => {
 exports.postStartEvent = async (req, res, next) => {
   try {
     const { timeStamp } = req.body;
-    // create a room for the user in the namespace of eventId
+    // create a room with eventId inside namespace of userId
     // emit message to synchronise the time
+    const userNamespace = WebSocket.getNamespace(req.user.userId);
+    const { type, eventId, duration } = req.event;
+    userNamespace.on("connect", (socket) => {
+      const cb = () => {
+        userNamespace.to(eventId), emit("1 second");
+      };
+      socket.join(eventId, () => {
+        new PersistentTimer({
+          duration,
+          userId,
+          eventId,
+          cb,
+        });
+      });
+    });
   } catch (error) {
     next(error);
   }
-}
+};
