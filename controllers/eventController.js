@@ -184,8 +184,8 @@ exports.postStartEvent = async (req, res, next) => {
     const userNamespace = WebSocket.getNamespace(req.user.userId);
     const { type, eventId, duration } = req.event;
     userNamespace.on("connect", (socket) => {
-      const cb = () => {
-        userNamespace.to(eventId), emit("1 second");
+      const cb = (timerValue) => {
+        userNamespace.to(eventId), emit("TIMER_SYNC", timerValue);
       };
       socket.join(eventId, () => {
         new PersistentTimer({
