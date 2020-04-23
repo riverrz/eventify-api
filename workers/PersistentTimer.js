@@ -12,9 +12,14 @@ class PersistentTimer {
       } else {
         redisClient.set(`${userId}-${eventId}`, new Date().toJSON());
       }
-      setInterval(() => {
-        cb();
-      }, calculatedDuration);
+      const interval = setInterval(() => {
+        if (calculatedDuration < 0) {
+          clearInterval(interval);
+        } else {
+          cb(calculatedDuration);
+          calculatedDuration -= 1000;
+        }
+      }, 1000);
     });
   }
 }
