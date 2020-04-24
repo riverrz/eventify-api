@@ -14,7 +14,7 @@ class WebSocket {
     if (!this.io) {
       throw new Error("SocketIO not initialised");
     }
-    this.namespaces[namespace] = io.of(namespace);
+    this.namespaces[namespace] = this.io.of(namespace);
   }
   getNamespace(namespace) {
     if(!this.namespaces.hasOwnProperty(namespace)) {
