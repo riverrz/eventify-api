@@ -185,12 +185,12 @@ exports.postStartEvent = async (req, res, next) => {
     const { type, eventId, duration } = req.event;
     userNamespace.on("connect", (socket) => {
       const cb = (timerValue) => {
-        userNamespace.to(eventId), emit("TIMER_SYNC", timerValue);
+        userNamespace.to(eventId).emit("TIMER_SYNC", timerValue);
       };
       socket.join(eventId, () => {
         new PersistentTimer({
           duration,
-          userId,
+          userId: req.user.userId,
           eventId,
           cb,
         });
@@ -198,6 +198,7 @@ exports.postStartEvent = async (req, res, next) => {
     });
     res.json(true);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
