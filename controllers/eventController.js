@@ -196,6 +196,7 @@ exports.postStartEvent = async (req, res, next) => {
         });
       });
     });
+    res.json(true);
   } catch (error) {
     next(error);
   }
