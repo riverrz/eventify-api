@@ -17,10 +17,13 @@ class WebSocket {
     this.namespaces[namespace] = this.io.of(namespace);
   }
   getNamespace(namespace) {
-    if(!this.namespaces.hasOwnProperty(namespace)) {
+    if (!this.namespaces.hasOwnProperty(namespace)) {
       this.createNamespace(namespace);
     }
     return this.namespaces[namespace];
+  }
+  disconnectById(socketId, removePermanent = true) {
+    this.io.sockets.connected[socketId].disconnect(removePermanent);
   }
 }
 

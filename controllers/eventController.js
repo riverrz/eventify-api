@@ -187,12 +187,25 @@ exports.postStartEvent = async (req, res, next) => {
       const cb = (message, timerValue) => {
         userNamespace.to(eventId).emit(message, timerValue);
       };
-      socket.join(eventId, () => {
-        new PersistentTimer({
-          duration,
-          userId: req.user.userId,
-          eventId,
-          cb,
+
+      // remove any previous socket in the room
+      userNamespace.in(eventId).clients((err, clients) => {
+        if (err) {
+          throw err;
+        }
+        // disconnect all client sockets
+        clients.forEach((socketId) => {
+          WebSocket.disconnectById(socketId);
+        });
+
+        // join the room
+        socket.join(eventId, () => {
+          new PersistentTimer({
+            duration,
+            userId: req.user.userId,
+            eventId,
+            cb,
+          });
         });
       });
     });
