@@ -1,4 +1,5 @@
 const { getClient } = require("../config/redisConfig");
+const { TIMER_OVER, TIMER_SYNC } = require("../websockets/constants");
 
 class PersistentTimer {
   constructor(init) {
@@ -14,9 +15,10 @@ class PersistentTimer {
       }
       const interval = setInterval(() => {
         if (calculatedDuration < 0) {
+          cb(TIMER_OVER, null);
           clearInterval(interval);
         } else {
-          cb(calculatedDuration);
+          cb(TIMER_SYNC, calculatedDuration);
           calculatedDuration -= 1000;
         }
       }, 1000);
