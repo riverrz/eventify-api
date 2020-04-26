@@ -64,7 +64,7 @@ exports.validateParticipationToken = async (req, res, next) => {
   try {
     try {
       const redisClient = getClient();
-      const recipient = await redisClient.getAsync(token);
+      const recipient = await redisClient.get(token);
       if (recipient && recipient === req.user.email) {
         return next();
       }
