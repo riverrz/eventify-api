@@ -2,7 +2,10 @@ const { getClient } = require("../config/redisConfig");
 const { TIMER_OVER, TIMER_SYNC } = require("../websockets/constants");
 
 class PersistentTimer {
-  constructor(init) {
+  constructor() {
+    this.timers = {}; // userId-eventId -> interval
+  }
+  createTimer(init) {
     const { duration, userId, eventId, cb } = init;
     const redisClient = getClient();
     let calculatedDuration = duration;
@@ -22,8 +25,12 @@ class PersistentTimer {
           calculatedDuration -= 1000;
         }
       }, 1000);
+      this.timers[`${userId}-${eventId}`] = interval;
     });
+  }
+  removeTimer(key) {
+    delete this.timers[key];
   }
 }
 
-module.exports = PersistentTimer;
+module.exports = new PersistentTimer();

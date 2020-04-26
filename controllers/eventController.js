@@ -193,14 +193,15 @@ exports.postStartEvent = async (req, res, next) => {
         if (err) {
           throw err;
         }
-        // disconnect all client sockets
+        // disconnect all client sockets and remove timers
         clients.forEach((socketId) => {
           WebSocket.disconnectById(socketId);
+          PersistentTimer.removeTimer(`${req.user.userId}-${eventId}`);
         });
 
         // join the room
         socket.join(eventId, () => {
-          new PersistentTimer({
+          PersistentTimer.createTimer({
             duration,
             userId: req.user.userId,
             eventId,
