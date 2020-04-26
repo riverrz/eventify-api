@@ -182,7 +182,7 @@ exports.postStartEvent = async (req, res, next) => {
     // create a room with eventId inside namespace of userId
     // emit message to synchronise the time
     const userNamespace = WebSocket.getNamespace(req.user.userId);
-    const { type, eventId, duration } = req.event;
+    const { type, eventId, duration, endTimeStamp } = req.event;
     userNamespace.on("connect", (socket) => {
       const cb = (message, timerValue) => {
         userNamespace.to(eventId).emit(message, timerValue);
@@ -203,9 +203,9 @@ exports.postStartEvent = async (req, res, next) => {
         socket.join(eventId, () => {
           PersistentTimer.createTimer({
             duration,
-            userId: req.user.userId,
-            eventId,
+            key: `${req.user.userId}-${eventId}`,
             cb,
+            expiry: new Date(endTimeStamp) - new Date(),
           });
         });
       });
