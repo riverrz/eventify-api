@@ -5,17 +5,20 @@ class PersistentTimer {
   constructor() {
     this.timers = {}; // userId-eventId -> interval
   }
-  createTimer(init) {
-    const { duration, userId, eventId, cb } = init;
+  async createTimer(init) {
+    const { duration, key, cb, expiry } = init;
     const redisClient = getClient();
     let calculatedDuration = duration;
-    redisClient.get(`${userId}-${eventId}`, (err, startedTimeStamp) => {
+    try {
+      const startedTimeStamp = await redisClient.get(key);
+
       if (startedTimeStamp) {
         calculatedDuration -=
           new Date().getTime() - new Date(startedTimeStamp).getTime();
       } else {
-        redisClient.set(`${userId}-${eventId}`, new Date().toJSON());
+        await redisClient.set(key, new Date().toJSON(), "PX", expiry);
       }
+
       const interval = setInterval(() => {
         if (calculatedDuration < 0) {
           cb(TIMER_OVER, null);
@@ -25,10 +28,14 @@ class PersistentTimer {
           calculatedDuration -= 1000;
         }
       }, 1000);
-      this.timers[`${userId}-${eventId}`] = interval;
-    });
+      this.timers[key] = interval;
+    } catch (error) {
+      console.log("Error");
+      throw err;
+    }
   }
   removeTimer(key) {
+    clearInterval(this.timers[key]);
     delete this.timers[key];
   }
 }
