@@ -182,7 +182,7 @@ exports.postStartEvent = async (req, res, next) => {
     // create a room with eventId inside namespace of userId
     // emit message to synchronise the time
     const userNamespace = WebSocket.getNamespace(req.user.userId);
-    const { type, eventId, duration, endTimeStamp } = req.event;
+    const { type, eventId, duration, endTimeStamp, content } = req.event;
     userNamespace.on("connect", (socket) => {
       const cb = (message, timerValue) => {
         userNamespace.to(eventId).emit(message, timerValue);
@@ -210,7 +210,7 @@ exports.postStartEvent = async (req, res, next) => {
         });
       });
     });
-    res.json(true);
+    res.json({ content });
   } catch (error) {
     console.log(error);
     next(error);
