@@ -3,6 +3,7 @@ const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
 const Modules = require("../models/Module");
+const UserReplies = require("../models/UserReplies");
 const WebSocket = require("../websockets");
 
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
@@ -213,6 +214,35 @@ exports.postStartEvent = async (req, res, next) => {
     res.json({ content });
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+};
+
+exports.postEndEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.event;
+    const { userId } = req.user;
+    const { replies } = req.body;
+    // Check if a reply with givent eventId and userId exists
+    // if yes then modify it
+    const updatedDoc = await UserReplies.findOneAndUpdate(
+      { eventId, userId },
+      { replies },
+      {
+        new: true,
+      }
+    );
+    if (!updatedDoc) {
+      const newUserReply = new UserReplies({
+        eventId,
+        userId,
+        replies,
+      });
+      await newUserReply.save();
+    }
+
+    res.json(true);
+  } catch (error) {
     next(error);
   }
 };

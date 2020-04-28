@@ -144,3 +144,27 @@ exports.isParticipant = async (req, res, next) => {
     next(error);
   }
 };
+exports.isLiveEvent = async (req, res, next) => {
+  try {
+    let { event } = req;
+    // find event if event is not attached to req already
+    if (!event) {
+      const eventId = req.params.eventId;
+      event = await Event.findOne({ eventId });
+      if (!foundEvent) {
+        const error = new Error("Invalid eventId");
+        error.statusCode = 401;
+        throw error;
+      }
+    }
+    // check if the event has ended
+    if (new Date(event.endTimeStamp) < new Date()) {
+      const error = new Error("Event has already finished!");
+      error.statusCode = 403;
+      throw error;
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};

@@ -13,6 +13,7 @@ const {
   validateModules,
   validTypeOfEvent,
   isParticipant,
+  isLiveEvent
 } = require("../middlewares/events");
 
 router.get("/all", isAuth, eventController.getAllEvent);
@@ -28,6 +29,14 @@ router.post(
   isAuth,
   isParticipant,
   eventController.postStartEvent
+);
+
+router.post(
+  "/end/:eventId",
+  isAuth,
+  isParticipant,
+  isLiveEvent,
+  eventController.postEndEvent
 );
 
 router.get("/:eventId", eventController.getEvent);
