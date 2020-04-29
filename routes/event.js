@@ -29,6 +29,7 @@ router.post(
   "/start/:eventId",
   isAuth,
   isParticipant,
+  hasAlreadySubmitted,
   eventController.postStartEvent
 );
 
@@ -57,7 +58,6 @@ router.post(
   isAuth,
   validateParticipationToken,
   splitParticipationToken,
-  hasAlreadySubmitted,
   eventController.postParticipate
 );
 
