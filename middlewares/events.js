@@ -2,6 +2,7 @@ const { isEmpty, propOr, isNil } = require("ramda");
 const ParticipationToken = require("../models/ParticipationToken");
 const { getClient } = require("../config/redisConfig");
 const Event = require("../models/Event");
+const UserReplies = require("../models/UserReplies");
 
 const typeOfEventsPossible = ["Contentful", "Generic", "Hosted"];
 
@@ -160,6 +161,20 @@ exports.isLiveEvent = async (req, res, next) => {
     // check if the event has ended
     if (new Date(event.endTimeStamp) < new Date()) {
       const error = new Error("Event has already finished!");
+      error.statusCode = 403;
+      throw error;
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.hasAlreadySubmitted = async (req, res, next) => {
+  try {
+    const foundReply = await UserReplies.findOne({ userId: req.user.userId });
+    if (foundReply) {
+      const error = new Error("You have already submitted your response!");
       error.statusCode = 403;
       throw error;
     }
