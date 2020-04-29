@@ -3,7 +3,12 @@ const Event = require("../models/Event");
 const ParticipationToken = require("../models/ParticipationToken");
 const User = require("../models/User");
 const Modules = require("../models/Module");
+const UserReplies = require("../models/UserReplies");
+const WebSocket = require("../websockets");
+
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
+const PersistentTimer = require("../workers/PersistentTimer");
+
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
 
 const eventTransformation = {
@@ -167,6 +172,76 @@ exports.getModules = async (req, res, next) => {
   try {
     const data = await Modules.find({}).select("name moduleId -_id");
     res.json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postStartEvent = async (req, res, next) => {
+  try {
+    const { timeStamp } = req.body;
+    // create a room with eventId inside namespace of userId
+    // emit message to synchronise the time
+    const userNamespace = WebSocket.getNamespace(req.user.userId);
+    const { type, eventId, duration, endTimeStamp, content } = req.event;
+    userNamespace.on("connect", (socket) => {
+      const cb = (message, timerValue) => {
+        userNamespace.to(eventId).emit(message, timerValue);
+      };
+
+      // remove any previous socket in the room
+      userNamespace.in(eventId).clients((err, clients) => {
+        if (err) {
+          throw err;
+        }
+        // disconnect all client sockets and remove timers
+        clients.forEach((socketId) => {
+          WebSocket.disconnectById(socketId);
+          PersistentTimer.removeTimer(`${req.user.userId}-${eventId}`);
+        });
+
+        // join the room
+        socket.join(eventId, () => {
+          PersistentTimer.createTimer({
+            duration,
+            key: `${req.user.userId}-${eventId}`,
+            cb,
+            expiry: new Date(endTimeStamp) - new Date(),
+          });
+        });
+      });
+    });
+    res.json({ content });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+exports.postEndEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.event;
+    const { userId } = req.user;
+    const { replies } = req.body;
+    // Check if a reply with givent eventId and userId exists
+    // if yes then modify it
+    const updatedDoc = await UserReplies.findOneAndUpdate(
+      { eventId, userId },
+      { replies },
+      {
+        new: true,
+      }
+    );
+    if (!updatedDoc) {
+      const newUserReply = new UserReplies({
+        eventId,
+        userId,
+        replies,
+      });
+      await newUserReply.save();
+    }
+
+    res.json(true);
   } catch (error) {
     next(error);
   }
