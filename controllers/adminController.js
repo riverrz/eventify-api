@@ -17,7 +17,7 @@ exports.postSendReminders = async (req, res, next) => {
   try {
     const { eventId } = req.body;
     const event = await Event.findOne({ eventId })
-      .populate("participants")
+      .populate("participantList", "username email -_id")
       .exec();
     sendReminders(event);
     res.json({ success: true });

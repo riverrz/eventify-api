@@ -94,4 +94,11 @@ eventSchema.virtual("creator", {
   justOne: true,
 });
 
+eventSchema.virtual("participantList", {
+  ref: "User",
+  localField: "participants",
+  foreignField: "userId",
+  justOne: false,
+});
+
 module.exports = new mongoose.model("Event", eventSchema);

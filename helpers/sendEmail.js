@@ -29,7 +29,7 @@ const sendReminders = async (event) => {
   const emailArr = [];
   const subjectArr = [];
   const htmlArr = [];
-  event.participants.forEach(({ username, email }) => {
+  event.participantList.forEach(({ username, email }) => {
     const { subject, html } = reminderEmailContent(event, username);
     subjectArr.push(subject);
     htmlArr.push(html);
