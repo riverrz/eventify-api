@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shivam Kumar",
@@ -25,6 +25,7 @@
     "node-fetch": "^2.6.0",
     "ramda": "^0.27.0",
     "rand-token": "^0.4.0",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socketio-auth": "^0.1.1"
   }
 }
