@@ -8,7 +8,7 @@ if (cluster.isMaster) {
 
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
-    port = 8000 + i;
+    port = 8000 + i + 1;
     cluster.fork({ port: port });
   }
   cluster.on("exit", (worker, code, signal) => {
