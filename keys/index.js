@@ -15,4 +15,6 @@ module.exports = {
   AGENDA_COLLECTION_NAME: process.env.AGENDA_COLLECTION_NAME,
   NODE_ENV: process.env.NODE_ENV,
   SELF: process.env.SELF,
+  REDIS_HOST: process.env.REDIS_HOST,
+  REDIS_PORT: process.env.REDIS_PORT,
 };

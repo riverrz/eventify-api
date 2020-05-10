@@ -1,4 +1,5 @@
 const socketIO = require("socket.io");
+const redisAdapter = require("socket.io-redis");
 
 // a namespace would be userId and a room inside of this namespace would be eventId
 
@@ -9,6 +10,12 @@ class WebSocket {
   }
   init(server) {
     this.io = socketIO(server);
+    this.io.adapter(
+      redisAdapter({
+        host: "localhost",
+        port: 6379,
+      })
+    );
   }
   createNamespace(namespace) {
     if (!this.io) {
