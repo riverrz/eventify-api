@@ -25,7 +25,7 @@ router.get("/invited", isAuth, eventController.getInvitedEvents);
 
 router.get("/modules", isAuth, eventController.getModules);
 
-router.post(
+router.get(
   "/start/:eventId",
   isAuth,
   isParticipant,
