@@ -22,7 +22,7 @@ class PersistentTimer {
       const interval = setInterval(() => {
         if (calculatedDuration < 0) {
           cb(TIMER_OVER, null);
-          clearInterval(interval);
+          this.removeTimer(key);
         } else {
           cb(TIMER_SYNC, calculatedDuration);
           calculatedDuration -= 1000;
