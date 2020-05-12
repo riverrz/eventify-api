@@ -18,11 +18,12 @@ const joinEventHandler = async (socket, nsp) => {
       }
       const { userId, eventId } = payload;
       const event = await Event.findOne({ eventId });
+      const key = `${userId}-${eventId}`;
 
       // empty the room first if event is contentful
       if (event && event.type === "Contentful") {
         await clearRoomInsideNamespace(eventId, nsp, () => {
-          PersistentTimer.removeTimer(`${userId}-${eventId}`);
+          PersistentTimer.removeTimer(key);
         });
       }
 
@@ -62,18 +63,37 @@ const contentFulEventHandler = (socket, nsp) => {
       return;
     }
     const { duration, endTimeStamp } = event;
+
+    const key = `${userId}-${eventId}`;
     PersistentTimer.createTimer({
       duration,
-      key: `${userId}-${eventId}`,
+      key,
       cb: (message, data) =>
         emitToRoomInNamespace(eventId, nsp, { message, data }),
       expiry: new Date(endTimeStamp) - new Date(),
     });
+
+    // Add to socketMapping so that we can clearInterval when this socket disconnects
+    WebSocket.addSocketMapping(socket.id, key);
+
+    // Emit timer initialised event
     socket.emit("timer-initialised");
+  });
+};
+
+const socketDisconnectHandler = (socket, nsp) => {
+  socket.on("disconnect", () => {
+    // delete any ongoing timers for this socket using the socketMappings in WebSocket class
+    const key = WebSocket.socketMappings[socket.id];
+
+    PersistentTimer.removeTimer(key);
+
+    WebSocket.removeSocketMapping(socket.id);
   });
 };
 
 module.exports = {
   joinEventHandler,
   contentFulEventHandler,
+  socketDisconnectHandler,
 };
