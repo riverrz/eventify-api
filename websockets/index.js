@@ -9,6 +9,7 @@ class WebSocket {
   constructor() {
     this.io = null;
     this.namespaces = {};
+    this.socketMappings = {};
   }
   init(server) {
     onConnectHandlers = require("./onConnectHandlers");
@@ -48,6 +49,12 @@ class WebSocket {
   }
   disconnectById(socketId, removePermanent = true) {
     this.io.sockets.connected[socketId].disconnect(removePermanent);
+  }
+  addSocketMapping(socketId, identifier) {
+    this.socketMappings[socketId] = identifier;
+  }
+  removeSocketMapping(socketId) {
+    delete this.socketMappings[socketId];
   }
 }
 
