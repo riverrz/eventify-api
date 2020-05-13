@@ -1,16 +1,12 @@
 const WebSocket = require("../websockets");
 
-exports.clearRoomInsideNamespace = async (room, namespace, cb = () => {}) => {
-  return new Promise((resolve) => {
+exports.getClientsInRoom = async (room, namespace) => {
+  return new Promise((resolve, reject) => {
     namespace.in(room).clients((err, clients) => {
       if (err) {
-        return;
+        return reject(err);
       }
-      clients.forEach((socketId) => {
-        WebSocket.disconnectById(socketId, true);
-        cb(socketId);
-      });
-      resolve();
+      resolve(clients);
     });
   });
 };

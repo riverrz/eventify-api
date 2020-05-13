@@ -1,11 +1,10 @@
+const { isEmpty } = require("ramda");
+
 const { verifyToken } = require("../helpers/jwtToken");
 const Event = require("../models/Event");
 const PersistentTimer = require("../workers/PersistentTimer");
 const WebSocket = require("../websockets");
-const {
-  clearRoomInsideNamespace,
-  emitToRoomInNamespace,
-} = require("./helpers");
+const { getClientsInRoom, emitToRoomInNamespace } = require("./helpers");
 
 const joinEventHandler = async (socket, nsp) => {
   return new Promise((resolve, reject) => {
@@ -18,17 +17,19 @@ const joinEventHandler = async (socket, nsp) => {
       }
       const { userId, eventId } = payload;
       const event = await Event.findOne({ eventId });
-      const key = `${userId}-${eventId}`;
 
-      // empty the room first if event is contentful
+      // If contentful and a client already present then do not allow the socket to join
       if (event && event.type === "Contentful") {
-        await clearRoomInsideNamespace(eventId, nsp, () => {
-          PersistentTimer.removeTimer(key);
-        });
+        const clients = await getClientsInRoom(eventId, nsp);
+        if (!isEmpty(clients)) {
+          socket.disconnect(true);
+          return reject("Another session already present!");
+        }
       }
 
       // Join the room
       socket.join(eventId, () => {
+        console.log("Joined the room");
         socket.emit("join-event-successful");
         resolve();
       });
