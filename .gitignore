@@ -2,3 +2,4 @@ node_modules/
 keys/dev-keys.js
 playground/
 .env
+.vscode

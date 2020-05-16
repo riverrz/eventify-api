@@ -7,9 +7,9 @@ const UserReplies = require("../models/UserReplies");
 const WebSocket = require("../websockets");
 
 const manageParticipationTokens = require("../workers/manageParticipationTokens");
-const PersistentTimer = require("../workers/PersistentTimer");
 
 const calcExpirationInSeconds = require("../helpers/calcExpirationInSeconds");
+const { genToken } = require("../helpers/jwtToken");
 
 const eventTransformation = {
   startTimeStamp: (date) => new Date(date),
@@ -179,39 +179,13 @@ exports.getModules = async (req, res, next) => {
 
 exports.postStartEvent = async (req, res, next) => {
   try {
-    const { timeStamp } = req.body;
     // create a room with eventId inside namespace of userId
     // emit message to synchronise the time
-    const userNamespace = WebSocket.getNamespace(req.user.userId);
-    const { type, eventId, duration, endTimeStamp, content } = req.event;
-    userNamespace.on("connect", (socket) => {
-      const cb = (message, timerValue) => {
-        userNamespace.to(eventId).emit(message, timerValue);
-      };
+    WebSocket.getNamespace(req.user.userId);
+    const { eventId } = req.event;
 
-      // remove any previous socket in the room
-      userNamespace.in(eventId).clients((err, clients) => {
-        if (err) {
-          throw err;
-        }
-        // disconnect all client sockets and remove timers
-        clients.forEach((socketId) => {
-          WebSocket.disconnectById(socketId);
-          PersistentTimer.removeTimer(`${req.user.userId}-${eventId}`);
-        });
-
-        // join the room
-        socket.join(eventId, () => {
-          PersistentTimer.createTimer({
-            duration,
-            key: `${req.user.userId}-${eventId}`,
-            cb,
-            expiry: new Date(endTimeStamp) - new Date(),
-          });
-        });
-      });
-    });
-    res.json({ content });
+    const token = await genToken({ userId: req.user.userId, eventId });
+    res.json(token);
   } catch (error) {
     console.log(error);
     next(error);

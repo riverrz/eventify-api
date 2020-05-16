@@ -35,8 +35,10 @@ class PersistentTimer {
     }
   }
   removeTimer(key) {
-    clearInterval(this.timers[key]);
-    delete this.timers[key];
+    if (this.timers[key]) {
+      clearInterval(this.timers[key]);
+      delete this.timers[key];
+    }
   }
 }
 
