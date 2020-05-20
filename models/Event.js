@@ -36,6 +36,10 @@ const eventSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
+    participationFees: {
+      type: Number,
+      default: 0,
+    },
     participants: [{ type: String, ref: "User" }],
     modules: {
       type: [String],

@@ -117,6 +117,7 @@ exports.postEvent = async (req, res, next) => {
         "content",
         "type",
         "duration",
+        "participationFees",
       ])
     )(req.body);
     // Create and save event
@@ -159,7 +160,18 @@ exports.postParticipate = async (req, res, next) => {
       return next(error);
     }
 
+    const newBalance = req.user.balance - foundEvent.participationFees;
+    if (newBalance < 0) {
+      const error = new Error("Not enough balance!");
+      error.statusCode = 403;
+      return next(error);
+    }
+
     foundEvent.participants.push(req.user.userId);
+
+    // update user's balance
+    await req.user.updateBalance(newBalance);
+
     await foundEvent.save();
 
     res.json(true);
